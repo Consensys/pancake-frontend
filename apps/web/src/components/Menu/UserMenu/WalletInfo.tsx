@@ -31,7 +31,7 @@ import { useDomainNameForAddress } from 'hooks/useDomain'
 import { useState } from 'react'
 import { isMobile } from 'react-device-detect'
 import { getBlockExploreLink, getBlockExploreName } from 'utils'
-import { Address } from 'viem'
+import type { Address } from 'viem'
 import { useBalance } from 'wagmi'
 
 const COLORS = {
