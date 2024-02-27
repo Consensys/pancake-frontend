@@ -2,7 +2,7 @@ import { FAST_INTERVAL, SLOW_INTERVAL } from 'config/constants'
 // eslint-disable-next-line camelcase
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useActiveChainId } from 'hooks/useActiveChainId'
-import { viemClients } from 'utils/viem'
+import { getViemClients, viemClients } from 'utils/viem'
 import { useBlockNumber, usePublicClient } from 'wagmi'
 
 const REFRESH_BLOCK_INTERVAL = 6000
@@ -29,7 +29,7 @@ export const usePollBlockNumber = () => {
         })?.state?.data
       ) {
         const fetchInitialBlockTimestamp = async () => {
-          const provider = viemClients[chainId as keyof typeof viemClients]
+          const provider = getViemClients({ chainId: chainId as keyof typeof viemClients })
           if (provider) {
             const block = await provider.getBlock({ blockNumber: data })
             queryClient.setQueryData(['initialBlockTimestamp', chainId], Number(block.timestamp))

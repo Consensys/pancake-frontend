@@ -3,7 +3,8 @@ import { masterChefV3ABI } from '@pancakeswap/v3-sdk'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import { useMasterchefV3, useV3NFTPositionManagerContract } from 'hooks/useContract'
 import { useEffect, useMemo } from 'react'
-import { useContractRead, useContractReads, Address } from 'wagmi'
+import type { Address } from 'viem'
+import { useReadContract, useReadContracts } from 'wagmi'
 
 interface UseV3PositionsResults {
   loading: boolean
@@ -32,7 +33,7 @@ export function useV3PositionsFromTokenIds(tokenIds: bigint[] | undefined): UseV
         : [],
     [chainId, positionManager, tokenIds],
   )
-  const { isLoading, data: positions = [] } = useContractReads({
+  const { isLoading, data: positions = [] } = useReadContracts({
     contracts: inputs,
     watch: true,
     allowFailure: true,
@@ -98,7 +99,7 @@ export function useV3TokenIdsByAccount(
     isLoading: balanceLoading,
     data: accountBalance,
     refetch: refetchBalance,
-  } = useContractRead({
+  } = useReadContract({
     abi: masterChefV3ABI,
     address: contractAddress as `0x${string}`,
     args: [account ?? undefined],
@@ -135,12 +136,13 @@ export function useV3TokenIdsByAccount(
     isLoading: someTokenIdsLoading,
     data: tokenIds = [],
     refetch: refetchTokenIds,
-  } = useContractReads({
+  } = useReadContracts({
     contracts: tokenIdsArgs,
-    watch: true,
+    // watch: true, TODO: deprecated, to be replaced with a new watch mechanism
     allowFailure: true,
-    enabled: !!tokenIdsArgs.length,
-    keepPreviousData: true,
+    query: {
+      enabled: !!tokenIdsArgs.length,
+    },
   })
 
   // refetch when account changes, It seems like the useContractReads doesn't refetch when the account changes on production

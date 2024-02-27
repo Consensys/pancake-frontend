@@ -1,6 +1,7 @@
 import { useTranslation } from '@pancakeswap/localization'
 import { useToast } from '@pancakeswap/uikit'
 import { MasterChefV3, NonfungiblePositionManager } from '@pancakeswap/v3-sdk'
+import { useQueryClient } from '@tanstack/react-query'
 import { ToastDescriptionWithTx } from 'components/Toast'
 import { useActiveChainId } from 'hooks/useActiveChainId'
 import useCatchTxError from 'hooks/useCatchTxError'
@@ -10,7 +11,6 @@ import { calculateGasMargin } from 'utils'
 import { getViemClients, viemClients } from 'utils/viem'
 import { Address, hexToBigInt } from 'viem'
 import { useAccount, useSendTransaction, useWalletClient } from 'wagmi'
-import { useQueryClient } from '@tanstack/react-query'
 
 interface FarmV3ActionContainerChildrenProps {
   attemptingTxn: boolean
@@ -33,7 +33,7 @@ const useFarmV3Actions = ({
   const { chainId } = useActiveChainId()
   const { sendTransactionAsync } = useSendTransaction()
   const queryClient = useQueryClient()
-  const publicClient = viemClients[chainId as keyof typeof viemClients]
+  const publicClient = getViemClients({ chainId: chainId as keyof typeof viemClients })
 
   const { loading, fetchWithCatchTxError } = useCatchTxError()
 
