@@ -16,7 +16,7 @@ import { stringify } from 'querystring'
 import { safeGetAddress } from 'utils'
 import { getNftMarketAddress } from 'utils/addressHelpers'
 import { getNftMarketContract } from 'utils/contractHelpers'
-import { viemClients } from 'utils/viem'
+import { getViemClients } from 'utils/viem'
 import { Address } from 'viem'
 import { pancakeBunniesAddress } from 'views/Nft/market/constants'
 import { baseNftFields, baseTransactionFields, collectionBaseFields } from './queries'
@@ -73,7 +73,7 @@ const fetchCollectionsTotalSupply = async (collections: ApiCollection[]): Promis
         } as const),
     )
   if (totalSupplyCalls.length > 0) {
-    const client = viemClients[ChainId.BSC]
+    const client = getViemClients({ chainId: ChainId.BSC })
     const totalSupplyRaw = await client.multicall({
       contracts: totalSupplyCalls,
     })
@@ -493,7 +493,7 @@ export const getAccountNftsOnChainMarketData = async (
       } as const
     })
 
-    const askCallsResultsRaw = await viemClients[ChainId.BSC].multicall({
+    const askCallsResultsRaw = await getViemClients({ chainId: ChainId.BSC }).multicall({
       contracts: call,
       allowFailure: false,
     })
@@ -967,7 +967,7 @@ export const fetchWalletTokenIdsForCollections = async (
     } as const
   })
 
-  const client = viemClients[ChainId.BSC]
+  const client = getViemClients({ chainId: ChainId.BSC })
 
   const balanceOfCallsResultRaw = await client.multicall({
     contracts: balanceOfCalls,

@@ -98,7 +98,7 @@ import { v3AirdropABI } from 'config/abi/v3Airdrop'
 import { v3MigratorABI } from 'config/abi/v3Migrator'
 import { vCakeABI } from 'config/abi/vCake'
 import { veCakeABI } from 'config/abi/veCake'
-import { getViemClients, viemClients } from 'utils/viem'
+import { getViemClients } from 'utils/viem'
 import { Abi, Address, PublicClient, WalletClient, erc20Abi, erc721Abi, getContract as viemGetContract } from 'viem'
 
 export const getContract = <TAbi extends Abi | unknown[], TWalletClient extends WalletClient>({
@@ -117,7 +117,7 @@ export const getContract = <TAbi extends Abi | unknown[], TWalletClient extends 
   const c = viemGetContract({
     abi,
     address,
-    client: { public: publicClient ?? viemClients[chainId], wallet: signer },
+    client: { public: publicClient ?? getViemClients({ chainId }), wallet: signer },
   })
   return {
     ...c,

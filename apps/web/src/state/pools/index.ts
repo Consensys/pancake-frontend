@@ -46,7 +46,7 @@ import {
 } from 'state/types'
 import { safeGetAddress } from 'utils'
 import { fetchTokenAplPrice, isAlpToken } from 'utils/fetchTokenAplPrice'
-import { getViemClients, viemClients } from 'utils/viem'
+import { getViemClients } from 'utils/viem'
 import { Address, erc20Abi } from 'viem'
 
 import fetchFarms from '../farms/fetchFarms'
@@ -115,7 +115,7 @@ export const fetchCakePoolPublicDataAsync = () => async (dispatch) => {
 export const fetchCakePoolUserDataAsync =
   ({ account, chainId }: { account: string; chainId: ChainId }) =>
   async (dispatch) => {
-    const client = viemClients[ChainId.BSC]
+    const client = getViemClients({ chainId: ChainId.BSC })
     const [allowance, stakingTokenBalance] = await client.multicall({
       contracts: [
         {
