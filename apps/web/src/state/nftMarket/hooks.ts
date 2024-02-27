@@ -1,16 +1,17 @@
-import { safeGetAddress } from 'utils'
-import { useAtom } from 'jotai'
-import { TFetchStatus } from 'config/constants/types'
-import { getPancakeProfileAddress } from 'utils/addressHelpers'
 import { useQuery } from '@tanstack/react-query'
+import { TFetchStatus } from 'config/constants/types'
+import { useAtom } from 'jotai'
 import isEmpty from 'lodash/isEmpty'
-import { useContractReads, erc721ABI } from 'wagmi'
 import shuffle from 'lodash/shuffle'
+import { safeGetAddress } from 'utils'
+import { getPancakeProfileAddress } from 'utils/addressHelpers'
+import { erc721Abi } from 'viem'
+import { useReadContracts } from 'wagmi'
 
 import fromPairs from 'lodash/fromPairs'
-import { ApiCollections, NftToken, Collection, NftAttribute, MarketEvent } from './types'
+import { nftMarketActivityFiltersAtom, nftMarketFiltersAtom, tryVideoNftMediaAtom } from './atoms'
 import { getCollection, getCollections } from './helpers'
-import { nftMarketActivityFiltersAtom, tryVideoNftMediaAtom, nftMarketFiltersAtom } from './atoms'
+import { ApiCollections, Collection, MarketEvent, NftAttribute, NftToken } from './types'
 
 const DEFAULT_NFT_ORDERING = { field: 'currentAskPrice', direction: 'asc' as 'asc' | 'desc' }
 const DEFAULT_NFT_ACTIVITY_FILTER = { typeFilters: [], collectionFilters: [] }
@@ -57,17 +58,17 @@ export const useGetShuffledCollections = (): { data: Collection[]; status: 'pend
 }
 
 export const useApprovalNfts = (nftsInWallet: NftToken[]) => {
-  const { data } = useContractReads({
+  const { data } = useReadContracts({
     contracts: nftsInWallet.map(
       (f) =>
         ({
-          abi: erc721ABI,
+          abi: erc721Abi,
           address: f.collectionAddress,
           functionName: 'getApproved',
           args: [BigInt(f.tokenId)],
         } as const),
     ),
-    watch: true,
+    // watch: true, TODO: deprecated, to be replaced with a new watch mechanism
   })
 
   const profileAddress = getPancakeProfileAddress()

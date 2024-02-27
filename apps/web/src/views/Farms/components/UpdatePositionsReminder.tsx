@@ -10,7 +10,7 @@ import { useV3TokenIdsByAccount } from 'hooks/v3/useV3Positions'
 import { useMemo, useState } from 'react'
 import { useFarmsV3Public } from 'state/farmsV3/hooks'
 import { Hex, encodeFunctionData } from 'viem'
-import { useAccount, useContractReads, useSendTransaction } from 'wagmi'
+import { useAccount, useReadContracts, useSendTransaction } from 'wagmi'
 
 const lmPoolABI = [
   {
@@ -69,7 +69,7 @@ export function UpdatePositionsReminder_() {
   const masterchefV3 = useMasterchefV3()
   const { tokenIds: stakedTokenIds, loading } = useV3TokenIdsByAccount(masterchefV3?.address, account)
 
-  const stakedUserInfos = useContractReads({
+  const stakedUserInfos = useReadContracts({
     contracts: useMemo(
       () =>
         stakedTokenIds.map((tokenId) => ({
@@ -81,8 +81,9 @@ export function UpdatePositionsReminder_() {
         })),
       [chainId, masterchefV3, stakedTokenIds],
     ),
-    cacheTime: 0,
-    enabled: Boolean(!loading && stakedTokenIds.length > 0 && masterchefV3),
+    query: {
+      enabled: Boolean(!loading && stakedTokenIds.length > 0 && masterchefV3),
+    },
   })
 
   const isOverRewardGrowthGlobalUserInfos = stakedUserInfos?.data
@@ -107,7 +108,7 @@ export function UpdatePositionsReminder_() {
     })
 
   // getting it on client side to final confirm
-  const { data: rewardGrowthGlobalX128s, isLoading } = useContractReads({
+  const { data: rewardGrowthGlobalX128s, isLoading } = useReadContracts({
     contracts: isOverRewardGrowthGlobalUserInfos?.map((userInfo) => {
       const farm = farmsV3?.farmsWithPrice.find((f) => f.pid === Number(userInfo.pid))
       return {
@@ -118,8 +119,9 @@ export function UpdatePositionsReminder_() {
         chainId,
       }
     }),
-    cacheTime: 0,
-    enabled: (isOverRewardGrowthGlobalUserInfos?.length ?? 0) > 0,
+    query: {
+      enabled: (isOverRewardGrowthGlobalUserInfos?.length ?? 0) > 0,
+    },
   })
 
   const needRetrigger = isOverRewardGrowthGlobalUserInfos
